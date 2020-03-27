@@ -1,0 +1,16 @@
+variable                  = unit
+---------------------------------------
+Domestic supply quantity  = 1000 tonnes
+Export Quantity           = 1000 tonnes
+FatSQ                     = g/capita/day
+Feed                      = 1000 tonnes
+Food supply               = (kcal/capita/day)kcal/capita/day
+Food                      = 1000 tonnes
+FoodSQ                    = kg
+Import Quantity           = 1000 tonnes
+Losses                    = 1000 tonnes
+Other uses (non-food)     = 1000 tonnes
+Processing                = 1000 tonnes
+Production                = 1000 tonnes
+ProteinSQ                 = g/capita/day
+Stock Variation           = 1000 tonnes

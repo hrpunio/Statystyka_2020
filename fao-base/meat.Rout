@@ -1,0 +1,318 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R jest oprogramowaniem darmowym i dostarczany jest BEZ JAKIEJKOLWIEK GWARANCJI.
+Możesz go rozpowszechniać pod pewnymi warunkami.
+Wpisz 'license()' lub 'licence()' aby uzyskać szczegóły dystrybucji.
+
+R jest projektem kolaboracyjnym z wieloma uczestnikami.
+Wpisz 'contributors()' aby uzyskać więcej informacji oraz
+'citation()' aby dowiedzieć się jak cytować R lub pakiety R w publikacjach.
+
+Wpisz 'demo()' aby zobaczyć demo, 'help()' aby uzyskać pomoc on-line, lub
+'help.start()' aby uzyskać pomoc w przeglądarce HTML.
+Wpisz 'q()' aby wyjść z R.
+
+[Poprzednio zapisany obszar roboczy został przywrócony]
+
+> library(ggplot2)
+> library(dplyr)
+
+Dołączanie pakietu: ‘dplyr’
+
+Następujące obiekty zostały zakryte z ‘package:stats’:
+
+    filter, lag
+
+Następujące obiekty zostały zakryte z ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> library(tidyr)
+> options(dplyr.print_max = 1e9)
+> 
+> fbs <- read.csv("faostat.csv", sep = ';',  header=T, na.string="NA");
+> ## Remove unit
+> fbs$unit <- NULL
+> 
+> str(fbs)
+'data.frame':	92913 obs. of  5 variables:
+ $ country: Factor w/ 183 levels "Afghanistan",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ var    : Factor w/ 14 levels "Domestic supply quantity",..: 12 12 12 12 12 12 12 12 12 12 ...
+ $ yearC  : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ year   : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ value  : num  129 132 139 144 150 175 184 202 202 189 ...
+> 
+> ## zamień format wąski na szeroki
+> ## (daje niepoprawny wynik jeżeli nie usuniemy kolumny unit)
+> fbsx <- fbs %>% spread(var, value, drop=T)
+> ## zamień FatSQ z gramów/dzień w kg/rok
+> fbsx$FatSQ <- fbsx$FatSQ * 365 / 1000
+> str(fbsx)
+'data.frame':	8622 obs. of  17 variables:
+ $ country                      : Factor w/ 183 levels "Afghanistan",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ yearC                        : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ year                         : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ Domestic supply quantity     : num  129 132 139 144 150 175 184 202 202 189 ...
+ $ Export Quantity              : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ FatSQ                        : num  2.61 2.61 2.69 2.75 2.79 ...
+ $ Feed                         : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ Food                         : num  129 132 139 144 150 175 184 202 202 189 ...
+ $ Food supply (kcal/capita/day): num  89 89 91 93 95 107 109 118 114 105 ...
+ $ FoodSQ                       : num  14.4 14.5 14.9 15.1 15.4 ...
+ $ Import Quantity              : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ Losses                       : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ Other uses (non-food)        : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ Processing                   : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ Production                   : num  129 132 139 144 150 175 184 202 202 189 ...
+ $ ProteinSQ                    : num  5.68 5.69 5.84 5.9 6.04 6.94 7.14 7.61 7.46 6.76 ...
+ $ Stock Variation              : num  NA NA NA NA NA NA NA NA NA NA ...
+> ##head(fbsx, 20)
+> 
+> ## Tylko dla PL/DK/US
+> fbsx.PL <- fbsx %>% filter(country == "Poland") %>% as.data.frame
+> fbsx.DK <- fbsx %>% filter(country == "Denmark") %>% as.data.frame
+> fbsx.US <- fbsx %>% filter(country == "United States of America") %>% as.data.frame
+> 
+> ## Tylko dla AU/NZ/JP
+> fbsx.AU <- fbsx %>% filter(country == "Australia") %>% as.data.frame
+> fbsx.NZ <- fbsx %>% filter(country == "New Zealand") %>% as.data.frame
+> fbsx.JP <- fbsx %>% filter(country == "Japan") %>% as.data.frame
+> 
+> str(fbsx.PL)
+'data.frame':	53 obs. of  17 variables:
+ $ country                      : Factor w/ 183 levels "Afghanistan",..: 132 132 132 132 132 132 132 132 132 132 ...
+ $ yearC                        : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ year                         : int  1961 1962 1963 1964 1965 1966 1967 1968 1969 1970 ...
+ $ Domestic supply quantity     : num  1490 1511 1522 1585 1658 ...
+ $ Export Quantity              : num  207 209 179 181 241 197 215 217 214 194 ...
+ $ FatSQ                        : num  6.32 6.22 6 6.15 6.66 ...
+ $ Feed                         : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ Food                         : num  1401 1420 1426 1491 1559 ...
+ $ Food supply (kcal/capita/day): num  222 221 217 223 238 243 247 251 254 254 ...
+ $ FoodSQ                       : num  46.6 46.7 46.3 48 49.7 ...
+ $ Import Quantity              : num  12 6 53 43 47 59 50 93 42 51 ...
+ $ Losses                       : num  4 3 3 4 3 3 4 4 3 4 ...
+ $ Other uses (non-food)        : num  85 88 93 89 95 128 124 126 123 116 ...
+ $ Processing                   : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ Production                   : num  1718 1748 1662 1669 1841 ...
+ $ ProteinSQ                    : num  15.4 15.7 15.9 16.7 17.1 ...
+ $ Stock Variation              : num  -32 -34 -14 54 12 -18 18 -6 -24 8 ...
+> ##fbsx.PL$FoodSQ
+> 
+> cor(fbsx.PL$FatSQ, fbsx.PL$FoodSQ, use = "complete.obs")
+[1] 0.9871863
+> cor(fbsx.DK$FatSQ, fbsx.DK$FoodSQ, use = "complete.obs")
+[1] 0.9624747
+> cor(fbsx.US$FatSQ, fbsx.US$FoodSQ, use = "complete.obs")
+[1] 0.9497993
+> cor(fbsx.AU$FatSQ, fbsx.AU$FoodSQ, use = "complete.obs")
+[1] 0.06166735
+> 
+> fbsx.AU$FatSQ
+ [1] 14.73505 15.04530 14.72775 14.53795 14.08535 13.73130 13.48310 13.78605
+ [9] 14.42480 13.88095 14.87010 15.55630 13.99045 11.53765 13.57070 13.36630
+[17] 12.36620 12.73850 12.01945 12.26765 12.30415 12.31510 12.16545 12.38080
+[25] 13.04875 13.05970 12.88815 12.91005 12.85165 13.35170 12.93195 12.90640
+[33] 12.83705 12.82610 12.43920 12.00850 12.17275 12.61440 12.32240 12.69470
+[41] 12.11070 12.36985 12.76405 12.00850 12.73485 12.46110 13.23125 12.24575
+[49] 12.00850 12.00120 12.55600 12.54140 12.51585
+> 
+> fbsx.AU$FoodSQ
+ [1] 104.96 112.42 112.57 113.84 110.11 105.84 101.42 104.32 108.93 104.99
+[11] 111.82 116.28 110.75  94.77 125.12 129.76 125.96 130.12 113.46 110.66
+[21] 109.56 112.64 107.31 107.19 112.20 111.98 112.10 110.46 111.87 115.25
+[31] 112.12 112.14 110.81 111.70 108.76 107.63 105.90 110.70 110.38 111.07
+[41] 109.97 110.71 117.88 107.74 117.29 111.80 122.10 112.38 112.28 111.95
+[51] 121.12 117.33 116.23
+> 
+> cor(fbsx.NZ$FatSQ, fbsx.NZ$FoodSQ, use = "complete.obs")
+[1] 0.7486081
+> cor(fbsx.JP$FatSQ, fbsx.JP$FoodSQ, use = "complete.obs")
+[1] 0.9977828
+> ##
+> cor(fbsx.PL$ProteinSQ, fbsx.PL$FoodSQ, use = "complete.obs")
+[1] 0.9865414
+> cor(fbsx.DK$ProteinSQ, fbsx.DK$FoodSQ, use = "complete.obs")
+[1] 0.9569165
+> cor(fbsx.US$ProteinSQ, fbsx.US$FoodSQ, use = "complete.obs")
+[1] 0.988844
+> cor(fbsx.AU$ProteinSQ, fbsx.AU$FoodSQ, use = "complete.obs")
+[1] 0.9697688
+> cor(fbsx.NZ$ProteinSQ, fbsx.NZ$FoodSQ, use = "complete.obs")
+[1] 0.9976113
+> cor(fbsx.JP$ProteinSQ, fbsx.JP$FoodSQ, use = "complete.obs")
+[1] 0.9993289
+> 
+> summary(fbsx.PL$FatSQ); summary(fbsx.PL$FoodSQ); summary(fbsx.PL$ProteinSQ);
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  5.997   8.351   9.720   9.137  10.173  11.067 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  46.33   61.32   70.74   66.97   73.74   77.97 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.43   22.20   25.30   23.88   26.58   28.56 
+> summary(fbsx.US$FatSQ); summary(fbsx.US$FoodSQ); summary(fbsx.US$ProteinSQ); 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  8.256   8.964   9.676   9.846  10.625  11.384 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  88.65  106.17  111.30  111.34  118.70  125.76 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  30.58   35.23   36.96   37.13   39.22   41.74 
+> summary(fbsx.DK$FatSQ); summary(fbsx.DK$FoodSQ); summary(fbsx.DK$ProteinSQ)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  5.344   6.263   8.147   8.203  10.081  11.421 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  52.41   61.03   74.85   76.31   92.52  108.42 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.90   18.51   23.30   23.71   28.57   32.61 
+> summary(fbsx.AU$FatSQ); summary(fbsx.AU$FoodSQ); summary(fbsx.AU$ProteinSQ);
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  11.54   12.32   12.76   13.01   13.48   15.56 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  94.77  109.56  111.82  112.24  113.46  130.12 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  32.71   37.81   38.43   38.82   39.46   46.51 
+> summary(fbsx.US$FatNZ); summary(fbsx.NZ$FoodSQ); summary(fbsx.NZ$ProteinSQ); 
+Length  Class   Mode 
+     0   NULL   NULL 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  88.43  102.81  107.62  107.96  111.20  146.68 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  28.68   33.50   35.01   35.37   36.59   49.32 
+> summary(fbsx.DK$FatJP); summary(fbsx.JP$FoodSQ); summary(fbsx.JP$ProteinSQ);
+Length  Class   Mode 
+     0   NULL   NULL 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   7.63   23.21   36.52   32.94   44.32   49.77 
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   2.86    7.49   11.78   10.78   14.44   16.35 
+> 
+> ## Wykres
+> 
+> p1 <- ggplot() +
++     ggtitle("FAO: mięso/proteiny (kropkowana)/tłuszcz (przerywana) per capita/rok [kg]") +
++     ##
++     geom_line( data = fbsx.PL, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='PL' ), alpha=.5, size=.8) +
++     geom_line( data = fbsx.US, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='US' ), alpha=.5, size=.8) +
++     geom_line( data = fbsx.DK, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='DK' ), alpha=.5, size=.8) +
++     ##
++     geom_line( data = fbsx.PL, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='PL'), linetype = "dashed", alpha=.5, size=.8) +
++     geom_line( data = fbsx.US, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='US'), linetype = "dashed", alpha=.5, size=.8) +
++     geom_line( data = fbsx.DK, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='DK'), linetype = "dashed", alpha=.5, size=.8) +
++     ##
++     geom_line( data = fbsx.PL, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='PL'), linetype = "dotted", alpha=.5, size=.8) +
++     geom_line( data = fbsx.US, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='US'), linetype = "dotted", alpha=.5, size=.8) +
++     geom_line( data = fbsx.DK, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='DK'), linetype = "dotted", alpha=.5, size=.8) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p2 <- ggplot() +
++     ggtitle("FAO: mięso/proteiny (kropkowana)/tłuszcz (przerywana) per capita/rok [kg]") +
++     ##
++     geom_line( data = fbsx.AU, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='AU' ), alpha=.5, size=.8) +
++     geom_line( data = fbsx.NZ, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='NZ' ), alpha=.5, size=.8) +
++     geom_line( data = fbsx.JP, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FoodSQ, colour='JP' ), alpha=.5, size=.8) +
++     ##
++     geom_line( data = fbsx.AU, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='AU'), linetype = "dashed", alpha=.5, size=.8) +
++     geom_line( data = fbsx.NZ, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='NZ'), linetype = "dashed", alpha=.5, size=.8) +
++     geom_line( data = fbsx.JP, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =FatSQ, colour='JP'), linetype = "dashed", alpha=.5, size=.8) +
++     ##
++     geom_line( data = fbsx.AU, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='AU'), linetype = "dotted", alpha=.5, size=.8) +
++     geom_line( data = fbsx.NZ, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='NZ'), linetype = "dotted", alpha=.5, size=.8) +
++     geom_line( data = fbsx.JP, mapping = aes(x=as.Date(as.factor(year), format="%Y"), y =ProteinSQ, colour='JP'), linetype = "dotted", alpha=.5, size=.8) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p3 <- ggplot() +
++     ggtitle("FAO: mięso vs tłuszcz er capita/rok [kg]/AU)") +
++     geom_point( data = fbsx.AU, mapping = aes(x=FatSQ, y =FoodSQ, colour='fat' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.AU, mapping = aes(x=FatSQ, y =FoodSQ), method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> p3p <- ggplot() +
++     ggtitle("FAO: mięso vs protein / protein per capita/rok [kg]/AU)") +
++     geom_point( data = fbsx.AU, mapping = aes(x=ProteinSQ, y =FoodSQ, colour='protein' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.AU, mapping = aes(x=ProteinSQ, y =FoodSQ), method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p4 <- ggplot() +
++     ggtitle("FAO: mięso vs tłuszcz per capita/rok [kg]/US)") +
++     geom_point( data = fbsx.US, mapping = aes(x=FatSQ, y =FoodSQ, colour='fat' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.US, mapping = aes(x=FatSQ, y =FoodSQ), method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p4p <- ggplot() +
++     ggtitle("FAO: mięso vs protein / protein per capita/rok [kg]/US)") +
++     geom_point( data = fbsx.US, mapping = aes(x=ProteinSQ, y =FoodSQ, colour='protein' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.US, mapping = aes(x=ProteinSQ, y =FoodSQ), method=lm) +
++     geom_smooth(method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p5 <- ggplot() +
++     ggtitle("FAO: mięso vs tłuszcz / protein per capita/rok [kg]/PL)") +
++     geom_point( data = fbsx.PL, mapping = aes(x=FatSQ, y =FoodSQ, colour='fat' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.PL, mapping = aes(x=FatSQ, y =FoodSQ), method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p5p <- ggplot() +
++     ggtitle("FAO: mięso vs tłuszcz / protein per capita/rok [kg]/PL)") +
++     geom_point( data = fbsx.PL, mapping = aes(x=ProteinSQ, y =FoodSQ, colour='protein' ), alpha=.5, size=2) +
++     geom_smooth(data = fbsx.PL, mapping = aes(x=ProteinSQ, y =FoodSQ), method=lm) +
++     geom_smooth(method=lm) +
++     ##
++     ylab(label="kg") +
++     xlab(label="") +
++     labs(colour = "") +
++     theme(legend.position="top") +
++     theme(legend.text=element_text(size=12));
+> 
+> p1
+> 
+> p2
+> 
+> p3
+> p3p
+> 
+> p4 
+> p4p
+> 
+> p5
+> p5p
+> 
+> proc.time()
+użytkownik     system   upłynęło 
+     3.115      0.053      3.156 

@@ -1,0 +1,60 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R jest oprogramowaniem darmowym i dostarczany jest BEZ JAKIEJKOLWIEK GWARANCJI.
+Możesz go rozpowszechniać pod pewnymi warunkami.
+Wpisz 'license()' lub 'licence()' aby uzyskać szczegóły dystrybucji.
+
+R jest projektem kolaboracyjnym z wieloma uczestnikami.
+Wpisz 'contributors()' aby uzyskać więcej informacji oraz
+'citation()' aby dowiedzieć się jak cytować R lub pakiety R w publikacjach.
+
+Wpisz 'demo()' aby zobaczyć demo, 'help()' aby uzyskać pomoc on-line, lub
+'help.start()' aby uzyskać pomoc w przeglądarce HTML.
+Wpisz 'q()' aby wyjść z R.
+
+[Poprzednio zapisany obszar roboczy został przywrócony]
+
+> library("ggplot2");
+> library("dplyr")
+
+Dołączanie pakietu: ‘dplyr’
+
+Następujące obiekty zostały zakryte z ‘package:stats’:
+
+    filter, lag
+
+Następujące obiekty zostały zakryte z ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> d <- read.csv("ws2018_k_CC.csv", sep = ';',  header=T, na.string="NA");
+> 
+> fivenum(d$lkw)
+[1]    0  352  579  841 2208
+> m <- mean(d$lkw)
+> 
+> s <- sd(d$lkw)
+> allN <- nrow(d)
+> dSS <- d %>% filter(lkw > m - s & lkw < m +s )  %>% as.data.frame
+> allS <- nrow(dSS)
+> p <- allS/allN * 100
+> 
+> ## rozkład
+> ggplot(d, aes(x = lkw)) + geom_histogram(binwidth = 1) +
++   geom_vline(xintercept = m, colour="forestgreen", size=2) +
++   geom_vline(xintercept = m - 3 * s, colour="forestgreen", size=1) +
++   geom_vline(xintercept = m + 3 * s, colour="forestgreen", size=1) +
++   geom_vline(xintercept = m - 1 * s, colour="forestgreen", size=1) +
++   geom_vline(xintercept = m + 1 * s, colour="forestgreen", size=1) +
++   ggtitle("Liczba głosów/obwód do sejmików wojewódzkich 2018") +
++   annotate("text", x=2, y=100, label=sprintf("śr=%.2f os=%.2f śr+/-os%%=%.2f", m, s, p), size=6, color="red")
+> 
+> 
+> 
+> proc.time()
+użytkownik     system   upłynęło 
+     3.009      0.071      3.115 

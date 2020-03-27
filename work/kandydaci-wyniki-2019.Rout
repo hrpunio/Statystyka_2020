@@ -1,0 +1,71 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R jest oprogramowaniem darmowym i dostarczany jest BEZ JAKIEJKOLWIEK GWARANCJI.
+Możesz go rozpowszechniać pod pewnymi warunkami.
+Wpisz 'license()' lub 'licence()' aby uzyskać szczegóły dystrybucji.
+
+R jest projektem kolaboracyjnym z wieloma uczestnikami.
+Wpisz 'contributors()' aby uzyskać więcej informacji oraz
+'citation()' aby dowiedzieć się jak cytować R lub pakiety R w publikacjach.
+
+Wpisz 'demo()' aby zobaczyć demo, 'help()' aby uzyskać pomoc on-line, lub
+'help.start()' aby uzyskać pomoc w przeglądarce HTML.
+Wpisz 'q()' aby wyjść z R.
+
+[Poprzednio zapisany obszar roboczy został przywrócony]
+
+> ## Ocena zależności pomiędzy odsetkiem głosów nieważnych
+> ## a uzyskanym wynikiem w wyborach samorządowych do sejmików wojewódzkich 2014
+> ## 
+> require (ggplot2)
+Ładowanie wymaganego pakietu: ggplot2
+> library(dplyr)
+
+Dołączanie pakietu: ‘dplyr’
+
+Następujące obiekty zostały zakryte z ‘package:stats’:
+
+    filter, lag
+
+Następujące obiekty zostały zakryte z ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> #######################################
+> ## Dane ###############################
+> #######################################
+> d <- read.csv("kandydaci-wyniki-2019.csv",  sep = ';',  header=T, na.string="NA");
+> 
+> fivenum(d$glosy, na.rm=T)
+[1]     13.0    371.0    812.5   2278.0 416030.0
+> m <- mean(d$glosy, na.rm=T)
+> s <- sd(d$glosy, na.rm=T)
+> 
+> allN <- nrow(d)
+> dSS <- d %>% filter(glosy > m - s & glosy < m +s )  %>% as.data.frame
+> dLL <- d %>% filter(glosy < m )  %>% as.data.frame
+> allS <- nrow(dSS)
+> allL <- nrow(dLL)
+> p <- allS/allN * 100
+> pL <- allL/allN * 100
+> 
+> d <- d %>% filter(glosy < 100000 )  %>% as.data.frame
+> 
+> ggplot(d, aes(x=glosy)) +
++   ggtitle("Wybory 2019: Kandydaci wg liczby głosów (bez rekordzistów)") +
++   xlab(label="x") + ylab(label="N") +
++   ##scale_y_continuous(limits = c(0, 440)) +
++   geom_histogram(binwidth=100, fill="steelblue",  alpha=.5) +
++   geom_vline(xintercept = m, colour="forestgreen", size=1) +
++   annotate("text", x=50000, y=100, label=sprintf("śr=%.2f os=%.2f śr+/-os%%=%.2f (%.2f)", m, s, p, pL), size=5, color="red")
+> 
+> ggsave(file="Kandydaci.png", width=10)
+Saving 10 x 7 in image
+> 
+> proc.time()
+użytkownik     system   upłynęło 
+     3.074      0.072      3.131 

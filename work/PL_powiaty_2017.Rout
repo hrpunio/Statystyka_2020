@@ -1,0 +1,39 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R jest oprogramowaniem darmowym i dostarczany jest BEZ JAKIEJKOLWIEK GWARANCJI.
+Możesz go rozpowszechniać pod pewnymi warunkami.
+Wpisz 'license()' lub 'licence()' aby uzyskać szczegóły dystrybucji.
+
+R jest projektem kolaboracyjnym z wieloma uczestnikami.
+Wpisz 'contributors()' aby uzyskać więcej informacji oraz
+'citation()' aby dowiedzieć się jak cytować R lub pakiety R w publikacjach.
+
+Wpisz 'demo()' aby zobaczyć demo, 'help()' aby uzyskać pomoc on-line, lub
+'help.start()' aby uzyskać pomoc w przeglądarce HTML.
+Wpisz 'q()' aby wyjść z R.
+
+[Poprzednio zapisany obszar roboczy został przywrócony]
+
+> library("ggplot2");
+> 
+> d <- read.csv("PL_powiaty_2017.csv", sep = ';',  header=T, na.string="NA");
+> 
+> fivenum(d$przychodMF)
+[1]  90.390 150.665 183.420 235.775 679.110
+> mean(d$przychodMF)
+[1] NA
+> 
+> ggplot(d, aes(x = przychodMF)) + geom_histogram(bins = nclass.Sturges(d$przychodMF))
+Komunikat ostrzegawczy:
+Removed 4 rows containing non-finite values (stat_bin). 
+> ggplot(d, aes(x = przychodMF)) + geom_histogram(binwidth = 40)
+Komunikat ostrzegawczy:
+Removed 4 rows containing non-finite values (stat_bin). 
+> 
+> 
+> proc.time()
+użytkownik     system   upłynęło 
+     1.133      0.068      1.200 

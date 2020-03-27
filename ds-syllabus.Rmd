@@ -1,0 +1,60 @@
+---
+title: "Statystyka: sylabus"
+author: "Tomasz Przechlewski"
+date: "27 03 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 0. Informacje organizacyjne
+
+Materiały są dostępne pod adresem: https://github.com/hrpunio/Statystyka_2020
+Można je pobrać klikając w zielony przycisk i wybierając
+`Download ZIP'.
+
+Kontakt: tprzechlewski@gmail.com
+
+## 1. Przedmiot metoda i organizacja badań statystycznych
+
+notatki do wykładu: stata123.html
+
+## 2. Wykresy statystyczne dla danych przekrojowych
+
+notatki do wykładu: stata123.html
+   
+notatki do wykładu: stata123.html
+
+## 3. Liczbowy opis danych 
+
+**Średnie** (średnia arytemetyczna, mediana, dominanta, kwartyle),
+**Miary rozproszenia** (wariancja, odchylenie standardowe, rozstęp międzykwartylowy),
+**Skośność**, **Koncentracja**
+
+notatki do wykładu: stata123.html
+
+
+## 4. Metody analiza współzależnośc
+
+**wykresy rozproszenia**, **korelacja**, **regresja**, **współzależniść dla danych jakościowych**,
+  **tablice dwudzielne**
+
+notatki do wykładu: stata456.html
+
+## 5. Analiza szeregów czasowych
+  **wykresy**, **przyrosty**, **indeksy**, **średnie tempo wzrostu**, **średnia ruchowa**,
+  **wygładzanie wykładnicze**
+
+notatki do wykładu: stata456.html
+
+## 6. Analiza szeregów czasowych
+  **dekompozycja szeregów czasowych**, **trend**, **sezonowość**, **prognozowanie**
+
+notatki do wykładu: stata456.html
+
+## Zaliczenie ćwiczeń: projekt
+
+Mam nadzieję że wrócimy do szkoły w kwietniu i wymagania odnośnie
+projekt przedstawię na zajęciach w maju

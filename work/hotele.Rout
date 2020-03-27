@@ -1,0 +1,65 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R jest oprogramowaniem darmowym i dostarczany jest BEZ JAKIEJKOLWIEK GWARANCJI.
+Możesz go rozpowszechniać pod pewnymi warunkami.
+Wpisz 'license()' lub 'licence()' aby uzyskać szczegóły dystrybucji.
+
+R jest projektem kolaboracyjnym z wieloma uczestnikami.
+Wpisz 'contributors()' aby uzyskać więcej informacji oraz
+'citation()' aby dowiedzieć się jak cytować R lub pakiety R w publikacjach.
+
+Wpisz 'demo()' aby zobaczyć demo, 'help()' aby uzyskać pomoc on-line, lub
+'help.start()' aby uzyskać pomoc w przeglądarce HTML.
+Wpisz 'q()' aby wyjść z R.
+
+[Poprzednio zapisany obszar roboczy został przywrócony]
+
+> library("ggplot2");
+> library("dplyr");
+
+Dołączanie pakietu: ‘dplyr’
+
+Następujące obiekty zostały zakryte z ‘package:stats’:
+
+    filter, lag
+
+Następujące obiekty zostały zakryte z ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> d <- read.csv("hotele_caloroczne_PL.csv", sep = ';',  header=T, na.string="NA");
+> 
+> fivenum(d$hotele2017)
+[1]   0   4   7  11 183
+> m <- mean(d$hotele2017)
+> s <- sd(d$hotele2017)
+> 
+> allN <- nrow(d)
+> dSS <- d %>% filter(hotele2017 > m - s & hotele2017 < m +s )  %>% as.data.frame
+> allS <- nrow(dSS)
+> p <- allS/allN * 100
+> 
+> 
+> ## # rozkład
+> ggplot(d, aes(x = hotele2017)) + geom_histogram(binwidth = 1, fill="steelblue") +
++ ##geom_freqpoly(binwidth = 2, color="red", size=1) +
++ geom_vline(xintercept = m, colour="forestgreen", size=2) +
++ geom_vline(xintercept = m - 3 * s, colour="forestgreen", size=1) +
++ geom_vline(xintercept = m + 3 * s, colour="forestgreen", size=1) +
++ geom_vline(xintercept = m - 1 * s, colour="forestgreen", size=1) +
++ geom_vline(xintercept = m + 1 * s, colour="forestgreen", size=1) +
++ ggtitle("Powiaty w Polsce wg liczby hoteli (2017)") +
++ annotate("text", x=60, y=30, label=sprintf("śr=%.2f s=%.2f sr+/-s=%.2f", m, s, p ), size=5, color="black", hjust = 0)
+> 
+> 
+> ggsave("hotele.png")
+Saving 7 x 7 in image
+> 
+> 
+> proc.time()
+użytkownik     system   upłynęło 
+     1.809      0.083      1.883 
